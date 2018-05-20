@@ -1,4 +1,4 @@
-baseurl = "/"
+baseurl = "http://wesamhaboush.github.io/"
 title = "The Art Of Computer Science"
 copyright = "Copyright (c) 2018, all rights reserved."
 canonifyurls = true
