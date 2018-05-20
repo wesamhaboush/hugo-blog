@@ -1,0 +1,14 @@
+---
+title: About Me
+linktitle: About Me
+slug: about-me
+author:    Wesam Haboush
+email:     wesam.haboush@gmail.com
+date:      2003-12-06
+menu: "main"
+---
+
+= Who I Am?
+
+A passionate software engineer that cares about his family, his craft, and also
+loves guitar playing, drawing, and reading.
