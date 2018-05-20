@@ -5,7 +5,7 @@ author:    Wesam Haboush
 email:     wesam.haboush@gmail.com
 date:      2016-05-12
 slug: project-euler-problem-29-distinct-powers
-excerpt: Non-bruteforce method to solving problem 29 from project Euler
+excerpt: Non-bruteforce method to solve problem 29 from project Euler
 :hp-tags: factorization, perfect powers, prime factorizations, distinct powers, euler project problem 29
 ---
 = Project Euler Problem 29 : Distinct Powers

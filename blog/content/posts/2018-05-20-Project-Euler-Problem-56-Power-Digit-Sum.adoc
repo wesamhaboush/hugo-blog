@@ -1,0 +1,118 @@
+---
+title: "Problem 56 : Powerful Digit Sum"
+linktitle: "Problem 56 : Powerful Digit Sum"
+slug: problem-56-powerful-digit-sum
+author:    Wesam Haboush
+email:     wesam.haboush@gmail.com
+date:      2018-05-20
+excerpt: Non-bruteforce method to solve problem 56 from project Euler
+:hp-tags: googol, maximum digital sum, kotlin
+---
+= Project Euler Problem 56 : Powerful Digit Sum
+Doc Writer <wesam.haboush@gmail.com>
+v1.0, 2018-05-20
+
+== Introduction
+
+Let's start with a link to the problem: https://projecteuler.net/problem=56[Euler Project Problem 56].
+
+The problem had been solved many times using a bruteforce approach, or an analytical approach that uses some estimation to zoom on the range of values to search for the max.
+
+I present here a `kotlin` implementation with an optimization approach that minimizes the search space considerably and allows to find the solution for *theoritically* any arbitrary base and exponent values.
+
+== Bruteforce Solution
+
+I have seen this done multiple times on the internet. An often cited solution in python looks like this:
+
+[source,python]
+----
+{{< highlight python >}}
+print max(sum(map(int, str(a**b))) for a in xrange(100) for b in xrange(100))
+{{</ highlight >}}
+----
+
+I have to say, the terseness of this solution is *impressive*. Python is just *impressive*. I wish it was typed :)
+
+Having said that, I feel this solution (and other uglier ones in uglier languages) that uses the pure bruteforce approaches are, mmm, missing the point? somehow we need to be smart__er__, no?
+
+Before, desperately, trying to produce some better solution, I am going to offer a kotlin solution that is bruteforce. Here it is:
+
+[source,kotlin]
+----
+{{< highlight kotlin >}}
+fun sumDigitsOfExponent(base: Int, exp: Int): Int =
+            BigInteger(base.toString())
+                    .pow(exp)
+                    .toString()
+                    .toCharArray()
+                    .map { it - '0' }
+                    .sum()
+
+fun maxPowerDigitSumBruteforce(maxBase: Int, maxExp: Int): Int =
+            generateSequence(1) { it + 1 }
+                    .take(maxBase)
+                    .flatMap { a ->
+                        generateSequence(1) { it + 1 }
+                                .take(maxExp)
+                                .map { b ->
+                                    sumDigitsOfExponent(a, b)
+                                }
+                    }
+                    .max() ?: 0
+{{</ highlight >}}
+----
+
+On my laptop, this takes between a 50 to 200ms. The median is around 78ms to find the solution. No doubt it is fairly fast! But it is also no doubt exhaustive. We do not use any knowledge of how numbers work, how numbers relate. No heuristics at all either.
+
+== Optimized Solution Using Max Digit Sum
+
+In order to eliminate a large area of the search space, we can use some of our knowledge about the problem without compromising its generality.
+
+First, we know that the max is likely to be closer to the top, rather than the bottom. So we start from larger values of both `a` and `b` (base and exponent), moving downward. That way we'll hit the max sooner than later.
+
+Second, if we keep the max we found so far as we scan values, we can also stop whenever the max sum possible is lower than the so-far-found max. Basically, once we can never produce a larger number from the one we have identified as our running max, then we stop.
+
+How do we calculate the max possible digit sum from a number `x`? well, let's use the equation for the number of digits in a number and multiply it by 9:
+
+[source,mathematica]
+----
+{{< highlight mathematica >}}
+MaxDigitSum(X) = floor(1 + log10(X)) * 9
+{{</ highlight >}}
+----
+
+If we use this approach, we cut the number of culculated digits sums from `99*99 = 9801` in the case of the bruteforce to around `2984`. This is only `30%` of the total search space. Not bad.
+
+Here is the code for this approach implemented in kotlin:
+
+[source,Kotlin]
+----
+{{< highlight Kotlin >}}
+fun maxPowerDigitSumOptimized(maxBase: Int, maxExp: Int): Int {
+        var base = maxBase
+        var maxSum = -1
+        while (maxSum < maxDigitSum(base, maxExp)) { // base loop
+            var exp = maxExp
+            while (maxSum < maxDigitSum(base, exp)) { // exp loop
+                maxSum = maxOf(maxSum, sumDigitsOfExponent(base, exp))
+                exp -= 1
+            }
+            base -= 1
+        }
+        return maxSum
+    }
+
+fun digitCountOf(base: Int, exp: Int): Int = Math.floor(1 + exp * Math.log10(base.toDouble())).toInt()
+
+fun maxDigitSum(base: Int, exp: Int): Int = 9 * digitCountOf(base, exp)
+{{</ highlight >}}
+----
+
+This solution took, on my laptop, between 24ms and 40ms. The median is about 25ms. This is `50%` improvement. Not bad.
+
+== Conclusion
+
+I believe there are other optimizations that we can do. For example, all bases that
+have zeros are unlikely to produce maximums. For example `10`, `100`, `30`, etc. However, this requires us to do more checks to establish, so might cause more overhead than its worth (unless we find an easy way to avoid doing the `10` multipliers).
+
+Here is a link to the full solution on gibhub: https://raw.githubusercontent.com/wesamhaboush/kotlin-algorithms/master/src/main/kotlin/algorithms/power-digit-sum.kt[Max Power Digit Sum in Kotlin]
