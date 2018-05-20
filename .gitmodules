@@ -1,3 +1,7 @@
 [submodule "blog/themes/hugo-dusk"]
 	path = blog/themes/hugo-dusk
 	url = https://github.com/gyorb/hugo-dusk
+[submodule "blog/public"]
+	path = blog/public
+	url = git@github.com:wesamhaboush/wesamhaboush.github.io.git
+	branch = master
